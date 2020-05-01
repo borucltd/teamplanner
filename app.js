@@ -9,17 +9,29 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const questions = require("./index");
 const render = require("./lib/htmlRenderer");
 
+// empty array of employees
+const employees = []
+
 // empty arrays for manager, engineerS and internS
 const manager = [];
 const engineers = [];
 const interns = [] ;
 
+
+
+// makes object from array of objects
+function concatenateObjects(arrayOfObjects) {
+
+	let mergedObject = {};
+	arrayOfObjects.forEach((element) => {
+		mergedObject = {...mergedObject, ...element};
+	});
+
+	return mergedObject;
+};
+
+
 // Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
-
-
-
-
 function collectData() {
 	let i = 0;
 	let keepgoing = true;
@@ -29,11 +41,9 @@ function collectData() {
 		inquirer.prompt(questions.questions[i])
 			.then((answer) => {
 				
-
 				// check on which question we are
 				switch(i) {
-					case 0: // create manager
-						//manager.push(answer);
+					case 0: // pick up team name - not important for now
 						i++;	
 						break;
 					case 1:	// push to manager
@@ -58,56 +68,106 @@ function collectData() {
 						break;
 					case 6: // push to engineers
 					case 7: // push to engineers
-					case 8: // push to engineers
-						engineers.push(answer);
-						i++;	
-						break;						
+					case 8: // push to engineers						
 					case 9:	// push to engineers and move back to question 5
+						if ( i < 9) {
+							i++;
+						} else {
+							i=5;
+						}
 						engineers.push(answer);
-						i=5;
 						break;
 					case 10: // push to interns
 					case 11: // push to interns
 					case 12: // push to interns
-						interns.push(answer);
-						i++;
-						break;
 					case questions.questions.length -1: //push to interns and move back to question 5
+						if ( i < questions.questions.length -1 ) {
+							i++;
+						} else {
+							i=5;
+						}
 						interns.push(answer);
-						i=5;
 						break;
 					default: // we need to do nothing
 					    break;
 				  }
 				  
+				// exit condition
 				if (keepgoing === true) {
 					// move on to the question pointed by index i
 					question = questions.questions[i];		
 					// recursive invoation 
 					askOneQuestion();
 				} else {
+					// we throw a fake error and will process the result in catch... 
 					throw "Thank you good bye!!!";
 				}
 			})
 			.catch(error => {
 				if (error.includes("Thank you")) {
-					console.log(manager);
-					console.log(engineers);
-					console.log(interns);
-					console.log("INFO: " + error);   
+					
+					console.log("INFO: " + error);  
+
+					// generate manager object
+					const managerInput = concatenateObjects(manager);
+					employees.push(new Manager(managerInput.name,managerInput.id,managerInput.email,managerInput.number));
+
+					// generate engineer objects
+					let tmp = [];
+					let j=0;
+					if (engineers.length !== 0) {
+						for (let i=0;i<=engineers.length;i++) {
+							if (i%4 === 0 && i !== 0) {
+								// generate
+								const engineerInput = concatenateObjects(tmp);
+								employees.push(new Engineer(engineerInput.name,engineerInput.id,engineerInput.email,engineerInput.github));
+								// reset tmp
+								j=0;
+								tmp[j] = engineers[i];
+							} else {
+								tmp[j] = engineers[i];
+							}
+							j++;				
+						}
+					}
+					// generate intern objects
+					j=0;
+					if (interns.length !== 0) {
+						for (let i=0;i<=interns.length;i++) {
+							if (i%4 === 0 && i !== 0) {
+								// generate
+								const internInput = concatenateObjects(tmp);
+								employees.push(new Intern(internInput.name,internInput.id,internInput.email,internInput.school));
+								// reset tmp
+								j=0;
+								tmp[j] = interns[i];
+							} else {
+								tmp[j] = interns[i];
+							}
+							j++;				
+						}
+					}	
+					
+					
+					console.log(employees);
+
+					// render
+					console.log(render(employees));
 				} else {
 					console.log("ERROR: " + error);   
 				}
-				
 			})
 		}
 
 	// here we start 
 	askOneQuestion();
+
+	
 }
 
-
 collectData();
+// and to create objects for each team member (using the correct classes as blueprints!)
+
 
 
 

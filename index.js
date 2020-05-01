@@ -175,7 +175,7 @@ const questions = [
     },
 	{
         type: 'input',
-        name: 'number',
+        name: 'school',
         message: "What is your  intern's school?: ",
         validate: (input) => {
 
