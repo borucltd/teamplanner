@@ -1,4 +1,4 @@
-
+p
 
   # TeamPlanneR
 
@@ -30,6 +30,8 @@ node app.js
 
 Next follow the prompts and add members of your team. Once done, the application will create new directory in the current directory called "output".
 Inside "output" directory there will be a file "team.html". Open it in the web browser and enjoy.
+
+![Team Planner](./teamplanner.PNG)
 
 
   ## Credits
